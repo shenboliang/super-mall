@@ -28,7 +28,7 @@
       
    </scroll>
 
-    <div  class="dian">{{position}}</div>
+    <div class="anniu" @click="backTop"  v-if="position<=-700"></div>
   </div>
 </template>
 
@@ -117,11 +117,7 @@ export default {
 
         console.log(that.positionTo)
 
-          },500)
-
-
-
-
+          },300)
 
       })
 
@@ -142,6 +138,7 @@ export default {
   },  
   updated(){
      
+
 
       
 
@@ -224,10 +221,11 @@ export default {
 
       clickB(index){
 
-            this.currentIndex = index
-
-            
-      }
+            this.currentIndex = index 
+      },
+        backTop(){
+      this.$refs.scroll.scroll.scrollTo(0,0,500)
+    },
 
 
   },
@@ -257,6 +255,18 @@ export default {
 }
 </script>
 <style scoped>
+ .anniu{
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   background-image: url('../assets/img/index/backTop.png');
+   background-repeat: no-repeat;
+   background-size: cover;
+   background-color: blanchedalmond;
+   position: fixed;
+   bottom: 100px;
+   right: 20px;
+ }
 
 .dian{
     width: 50px;
