@@ -3,7 +3,7 @@
       <navbar class="navbar">
         <template v-slot:main>
                 <div class="div">
-                    <li v-for="(item,index) in list" :key='index' @click="click(index)" :class="{'active': index==currentIndex}">
+                    <li v-for="(item,index) in list" :key='index' @click="click(index)" :class="{'active': index==currentIndex}" @clickB='clickB(index)'> 
                         {{item}}
                     </li>
                 </div>
@@ -14,28 +14,38 @@
             </div>
         </template>
       </navbar>
+   
+    
+   <scroll class="wrapper" ref="scroll" :pull='false' >
 
-        <div class="context">
          <swiper :img='target.swrapper'/>
         <detailBase  :goods="goodInfo"></detailBase>
-        <detailshopInfo :shop="shopInfo" />
-        <detailimage :detailInfo="detailInfo" />
-        <detail-params :paramInfo="detailParams"/>
-        <detailComment :comment="detailComment"/>
-    </div>
+        <detailshopInfo  ref="shopInfo" :shop="shopInfo" />
+        <detailimage    :detailInfo="detailInfo" />
+        <detail-params  ref="params" :paramInfo="detailParams"/>
+        <detailComment  ref="detailCom" :comment="detailComment"/>
+        <detail-recommend  ref="recommend" :goods ="recommendD" />
+      
+   </scroll>
+
+    <div  class="dian">{{position}}</div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import navbar from '../components/navbar.vue'
-import {detail,Goods} from '../nextwork/detail.js'
+import {detail,Goods,recommendData} from '../nextwork/detail.js'
 import swiper from '../commont/swiper/swiper.vue'
 import detailBase from './detail-child/detailBase.vue'
 import detailshopInfo from './detail-child/detailshopInfo.vue'
 import detailimage from './detail-child/detailImage.vue'
 import detailParams from './detail-child/detailParams.vue'
 import detailComment from './detail-child/detailComment.vue'
+import detailRecommend from './detail-child/detailRecommend.vue'
+import { emitter } from '../eventBus'
+// import stopmore from '../stopmore.js'
+import scroll from '../commont/scroll.vue'
 export default {
   name: 'detail',
   components: {
@@ -45,7 +55,9 @@ export default {
    detailshopInfo,
    detailimage,
    detailParams,
-   detailComment
+   detailComment,
+   detailRecommend,
+   scroll
   },
   created(){
     //   console.log( this.$route.params)
@@ -85,22 +97,139 @@ export default {
 
             this.detailComment = data.rate.list[0]
 
-            console.log(this.detailComment)
-            
+        }   
+         emitter.on('detailimage',()=>{     
+                this.refresh() 
+        })  
+
+          // 等待数据加载完成并渲染后获取个组件的距离
+
+          var that = this
+
+          setTimeout(function(){
+        that.positionTo.push(0)      
+        
+        that.positionTo.push(-that.$refs.params.$el.offsetTop)
+
+        that.positionTo.push(-that.$refs.detailCom.$el.offsetTop)
+
+        that.positionTo.push(-that.$refs.recommend.$el.offsetTop)
+
+        console.log(that.positionTo)
+
+          },500)
+
+
+
+
+
+      })
+
+
+      // 拿到推荐信息
+
+      recommendData().then(res=>{
+
+            this.recommendD = res.data.data.list     
+       })
+
+ //  拿到 scroll组件传过来的 滚动值（通过事件总线的方式）
+
+        emitter.on('scrollT',(position)=>{
+
+               this.position = position.y         
+        })
+  },  
+  updated(){
+     
+
+      
+
+      if(this.positionTo.length !==0){
+
+        if(this.position>=this.positionTo[1]){
+            this.clickB(0)
+        }else if(this.positionTo[1]>this.position&&this.position>=this.positionTo[2]){
+            this.clickB(1)
+        }else if(this.positionTo[2]>this.position&&this.position>=this.positionTo[3]){
+            this.clickB(2)
+        }else{
+            this.clickB(3)
         }
 
+      }
         
-        
-            
-      })
+  },
+
+  
+ 
+  unmounted(){
+      emitter.off('scroll','detailimage')
   },
   methods:{
+      refresh(){
+          this.$refs.scroll&&this.$refs.scroll.scroll&&this.$refs.scroll.scroll.refresh()
+      },
       back(){
           this.$router.back()
       },
       click(index){
+            this.currentIndex = index  
+
+            switch(index){
+                case 0 :   
+                         this.$refs.scroll&&this.$refs.scroll.scroll.scrollTo(0,this.positionTo[0],50)
+
+                         this.position = this.positionTo[0]
+
+                        this.pan = false
+
+                    break;
+
+                case 1  : 
+
+                    var one = this.positionTo[1] -8
+
+                this.$refs.scroll&&this.$refs.scroll.scroll.scrollTo(0,one,50)
+
+                this.position = one
+
+                 break ; 
+
+                case 2 : 
+                     
+                      var two = this.positionTo[2] -8
+
+                    this.position = two
+
+                    this.$refs.scroll&&this.$refs.scroll.scroll.scrollTo(0,two,50)
+
+                  
+                    break;
+                case 3 : 
+
+
+                var three =  this.positionTo[3] -8
+
+                this.position =three
+
+
+                this.$refs.scroll&&this.$refs.scroll.scroll.scrollTo(0,three,50)
+
+                    break;
+            }
+
+          
+      },
+
+      clickB(index){
+
             this.currentIndex = index
+
+            
       }
+
+
   },
   data(){
       return {
@@ -115,12 +244,29 @@ export default {
           // 详情中图片数据
           detailInfo:{},
           detailParams:{},
-          detailComment:{}
+          detailComment:{},
+          // 获取到推荐商品信息
+          recommendD:[],
+          // scroll滚动距离值
+            position:0,
+        //  获取到各组件的距离，实现点击跳转到响应的内容
+           positionTo:[],
+           pan:true
       }
   }  
 }
 </script>
 <style scoped>
+
+.dian{
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    position: fixed;
+    left: 50px;
+    top: 200px;
+    display: none;
+}
 .navbar{
     background-color: white;
     color: gray;

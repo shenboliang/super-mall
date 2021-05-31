@@ -36,7 +36,9 @@
    
      this.scroll.on('scroll',(position)=>{
             this.position = position
-          this.chuan()
+
+              emitter.emit('scrollT',this.position)
+          
      })
           if(this.pull){
         this.scroll.on('pullingUp',()=>{
@@ -54,9 +56,7 @@
     },
   
     methods: {
-            chuan(){
-                 this.$emit('change',this.position)
-            },
+            
            
     }
   }
@@ -64,8 +64,9 @@
 
 <style scoped>
     .wrapper{
-          height: calc(100% - 106px);
+          /* height: calc(100% - 106px); */
           
+          height: 100vh;
           overflow: hidden;
          
     }

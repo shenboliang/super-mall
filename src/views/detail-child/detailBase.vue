@@ -17,7 +17,7 @@
 		</div>
          <div class="serves-wrap">
              <div v-for="(item,index) in goods.service" :key="index">
-                   <img :src="item.icon" alt="">
+                   <img :src="item.icon" alt=""  @load="loading">
                    {{item.name}}
              </div>
          </div>

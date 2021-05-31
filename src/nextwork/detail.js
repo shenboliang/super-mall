@@ -21,3 +21,10 @@ export function Goods(itemInfo,columns,service){
         }    
 }
 
+export function  recommendData(){
+
+    return  request({
+        url:'/recommend'
+    })
+
+}

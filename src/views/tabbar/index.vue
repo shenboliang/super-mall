@@ -6,7 +6,7 @@
      </template>
       </navbar> 
   <tabbar  :biao="['流行','新款','精选']"  :goodsItem = "goods" v-show="isshow" />
-   <scroll class="wrapper" @change='change' ref="scroll" :pull='true'>
+   <scroll  @change='change' ref="scroll" :pull='true'>
        <div class="content">
           <swiper  :img='banner' ></swiper>
             <recommend :title = 'recommend'></recommend>
@@ -93,6 +93,9 @@ export default {
   },
   mounted(){
      
+     emitter.on('scrollT',(position)=>{
+       this.positionT = position.y
+     })
 
           // 过滤防抖函数
   
@@ -101,7 +104,7 @@ export default {
 
     emitter.on('imgLoading',()=>{
 
-    refresh()     
+        refresh()     
     })
       
      //  拿到当前显示的位置下标
@@ -162,6 +165,8 @@ export default {
     },
     refresh(){
        this.$refs.scroll&&this.$refs.scroll.scroll&&this.$refs.scroll.scroll.refresh()
+
+     
        
     }
   }

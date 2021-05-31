@@ -55,6 +55,7 @@ export default {
 #detail_comment {
   font-size: 0.65rem;
   padding: 0.42rem 0.34rem;
+  border-bottom: 1px solid gray;
 }
 .comment_title {
   padding: 0.42rem 0;

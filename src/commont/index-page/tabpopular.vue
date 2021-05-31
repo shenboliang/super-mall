@@ -76,13 +76,14 @@ export default {
           emitter.emit('imgLoading');
       },
       tiaoDetail(item){
-         
+          this.$router.push('/detail/'+item.iid )
+
+        
 
           //  通过监听点击拿到用户点击的 li , 传到detail中，请求响应的数据展示
            
-           //  通过 路由，把获取到的iid（唯一标识） 传给detail使用
-
-           this.$router.push('/detail/'+ item.iid)
+           //  通过 事件总线，把获取到的iid（唯一标识） 传给detail使用
+           emitter.emit('detail',item.iid)
       }
   },
   mounted(){
