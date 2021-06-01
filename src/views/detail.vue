@@ -27,7 +27,7 @@
         <detail-recommend  ref="recommend" :goods ="recommendD" />
       
    </scroll>
-
+    <detailBar :goodsL="catData"  />
     <div class="anniu" @click="backTop"  v-if="position<=-700"></div>
   </div>
 </template>
@@ -46,6 +46,8 @@ import detailRecommend from './detail-child/detailRecommend.vue'
 import { emitter } from '../eventBus'
 // import stopmore from '../stopmore.js'
 import scroll from '../commont/scroll.vue'
+import detailBar  from './detail-child/detailBar.vue'
+
 export default {
   name: 'detail',
   components: {
@@ -57,9 +59,12 @@ export default {
    detailParams,
    detailComment,
    detailRecommend,
-   scroll
+   scroll,
+   detailBar
   },
   created(){
+      
+      
     //   console.log( this.$route.params)
 
      // 通过 路由 this.$route.params ， 拿到唯一标识 cid
@@ -75,6 +80,12 @@ export default {
             swrapper: data.itemInfo.topImages
         }
 
+        // 拿到购物车需要展示的标题赋值到对象中
+
+      this.catData.title =  res.data.result.itemInfo.title
+
+      this.catData.desc = data.itemInfo.desc
+
         // 创建商品对象，内部包含要展示的内容(一些商品信息，标题之类的)
 
          this.goodInfo =  Goods(data.itemInfo,data.columns,data.shopInfo.services)
@@ -87,6 +98,9 @@ export default {
 
         this.detailInfo = data.detailInfo
 
+        this.catData.link =  this.detailInfo.detailImage[0].list[0]
+
+    
         // 获得参数信息
 
         this.detailParams = data.itemParams
@@ -102,6 +116,10 @@ export default {
                 this.refresh() 
         })  
 
+          //  执行获取购物车数据的方法
+
+        this.catD()
+
           // 等待数据加载完成并渲染后获取个组件的距离
 
           var that = this
@@ -114,8 +132,6 @@ export default {
         that.positionTo.push(-that.$refs.detailCom.$el.offsetTop)
 
         that.positionTo.push(-that.$refs.recommend.$el.offsetTop)
-
-        console.log(that.positionTo)
 
           },300)
 
@@ -135,12 +151,11 @@ export default {
 
                this.position = position.y         
         })
+
+    
   },  
   updated(){
-     
-
-
-      
+    
 
       if(this.positionTo.length !==0){
 
@@ -227,6 +242,25 @@ export default {
       this.$refs.scroll.scroll.scrollTo(0,0,500)
     },
 
+     catD(){
+
+                // 把 iid 赋值到对象中，方便cat组件使用
+
+        this.catData.iid = this.$route.params.cid
+
+            //把购物车页面用到的数据赋值到对象中
+
+        //  this.catData.push(this.goodInfo)
+
+        this.catData.price = this.goodInfo.price
+
+        this.catData.count = 1
+
+            // 把购物车要展示的图片传到数组中
+
+        //    console.log(this.catData)
+     }
+
 
   },
   data(){
@@ -249,7 +283,9 @@ export default {
             position:0,
         //  获取到各组件的距离，实现点击跳转到响应的内容
            positionTo:[],
-           pan:true
+         
+           // 用一个数组来承载购物车组件要使用到的对象，方便传递给购物车组件
+           catData:{}
       }
   }  
 }

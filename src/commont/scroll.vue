@@ -64,9 +64,9 @@
 
 <style scoped>
     .wrapper{
-          /* height: calc(100% - 106px); */
+          height: calc(100% - 67px);
           
-          height: 100vh;
+          /* height: 100vh; */
           overflow: hidden;
          
     }

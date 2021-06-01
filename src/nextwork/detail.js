@@ -12,12 +12,13 @@ export function detail(iid){
 export function Goods(itemInfo,columns,service){
     
         return {
-            desc : itemInfo.desc,
-            price : itemInfo.price,
+            desc : itemInfo.title,
+            price : itemInfo.lowNowPrice,
             oldprice : itemInfo.oldPrice,
             discountDesc : itemInfo.discountDesc,
             columns : columns,
-            service : service
+            service : service,
+            
         }    
 }
 
