@@ -9,7 +9,7 @@
       <div class="text">
 
           <li v-for="(item,index) in goodsList" :key="index" @click="click(index)">
-                <span :class="{'dian':true,'active': xuanzhong(index)}"></span>
+                <span :class="{'dian':true,'active': goodsList[index].xuan}"></span>
 
                 <div class="content">
                    <img :src="item.link">
@@ -19,21 +19,25 @@
 
                       <div class="price">
                          <span class="thisprice">￥{{item.price}}</span>
-                         <span class="count">x{{item.count}}</span>
+                         <span class="count">x{{item.count}} </span>
                       </div>
                    </div>
 
                 </div>
           </li>      
       </div>
-   <heji  :zong='zong'  @quanxuan='xuan' />
+      <toast  :message="message"  :show='shows' />
+   <heji  :zong='zong' @mountFather='mount' :xianshi='shows' />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import navbar from '../../components/navbar.vue'
+import { emitter } from '../../eventBus'
 import  heji from './cat/heji.vue'
+import toast from  '../detail-child/toast.vue'
+
 
 
 export default {
@@ -41,6 +45,7 @@ export default {
   components: {
     navbar,
     heji,
+    toast
    
   },
   mounted(){
@@ -49,6 +54,8 @@ export default {
   methods:{
     click(index){
 
+          this.goodsList[index].xuan =  !this.goodsList[index].xuan
+
         this.currentIndex = index
 
           if(this.show.indexOf(this.currentIndex) === -1 ){
@@ -56,7 +63,6 @@ export default {
                 this.show.push(this.currentIndex)
 
                 this.zongjia.push(this.goodsList[this.currentIndex])
-
 
           }else{
 
@@ -79,56 +85,100 @@ export default {
           for(var item of this.zongjia){
                this.zong.price += parseInt(item.price*item.count)
                this.zong.count += item.count
-
-               
-          }
-         
-          }
-      
-    },
-      xuanzhong(index){
-
-          // console.log(this.show.indexOf(index))
-       return  this.show.indexOf(index) !== -1
-    },
-    xuan(event){
-      this.panQuan = event
-      console.log(this.panQuan)
-
-      if(this.panQuan){
-         
-              for(var i in this.goodsList){
-                this.click(i)
               }
          
-      }
-    }
-   
-  },
- 
-  activated(){
+          }
 
-      // 拿到 vuex中要展示的数据
+          this.zong.quanxuan =  this.goodsList.every((item)=>{
+              return   item.xuan == true
+          })
+
+        
+    },
+    mount(shows){
+
+      if(this.goodsList.length!==0){
+
+     var  n =  this.goodsList.every((item)=>{
+
+            return item.xuan == false
+          })
+          if(n){
+            this.shows = shows
+            
+          }
+           
+      }
+
+
+  
+
+    }
+
+  },
+
+  activated(){
+    // 拿到 vuex中要展示的数据
+
+
 
      if(this.$store.state.goodsList.length != 0 ){
 
 
         this.goodsList  = this.$store.state.goodsList
-
-      
-
         //  console.log(1111)
 
           for(var  item  of this.goodsList){
 
                this.count += item.count
           }
+
+          emitter.on('quanxuanOne',()=>{
+
+              var n = [] 
+
+       this.goodsList.forEach((item,index)=>{
+
+                if(item.xuan == false){
+                    n.push(index)
+                }
+            })
+        
+          for(var i of n){
+
+              var b  =  Number(i)
+              this.click(b)
+          }         
+      })
+
+       emitter.on('quxiao',()=>{
+
+           var m = [] 
+
+       this.goodsList.forEach((item,index)=>{
+
+                if(item.xuan == true){
+                    m.push(index)
+                }
+            })
+
+             for(var i of m ){
+               var  n = Number(i)
+              this.click(n)
+          }        
+          })
+
+
+
      }
+
   },
 
   deactivated(){
 
       this.count = 0
+
+      // emitter.off('biaozhun')
 
   },
   data(){
@@ -138,10 +188,10 @@ export default {
        currentIndex:-1,
        show : [],
        zongjia:[],
-       zong:{price:0,count:0},
-       // 判断全选
-        panQuan:false
-       
+       zong:{price:0,count:0,quanxuan:false},
+       // toast显示
+       shows:false,
+      message:'请选择购买的商品'
     }
   }
 }

@@ -5,12 +5,14 @@
          </span>
         <span class="he">合计:￥{{zong.price}}</span>
 
-        <span class="zong">去计算({{zong.count}})</span>
+        <span class="zong" @click="mount">去计算({{zong.count}})</span>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
+import {emitter} from '../../../eventBus.js'
+
  
 export default {
   name: 'heji',
@@ -22,24 +24,42 @@ export default {
         default(){
             return {}
         }
-    }    
+    },
+    xianshi:{
+      type:Boolean
+    }
+
+  },
+  created(){
   },
   methods:{
       click(){
           if(this.show){
               this.show=false
+              emitter.emit('quxiao')
+            
           }else{
               this.show = true
+            emitter.emit('quanxuanOne')
           }
+      },
+      mount(){
 
-            this.$emit( 'quanxuan',this.show)
+         this.shows = true
 
+          this.$emit('mountFather',this.shows)
+         setTimeout(()=>{
+        this.shows = false
+ this.$emit('mountFather',this.shows)
+         },1000)
+       
       }
   },
   
   data(){
       return {
-          show:false
+          show:false,
+          shows:false
       }
   }
 

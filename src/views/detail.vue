@@ -27,8 +27,9 @@
         <detail-recommend  ref="recommend" :goods ="recommendD" />
       
    </scroll>
-    <detailBar :goodsL="catData"  />
+    <detailBar :goodsL="catData" @addcat='addcat' />
     <div class="anniu" @click="backTop"  v-if="position<=-700"></div>
+    <toast :message='message' :show="show"  />
   </div>
 </template>
 
@@ -47,6 +48,7 @@ import { emitter } from '../eventBus'
 // import stopmore from '../stopmore.js'
 import scroll from '../commont/scroll.vue'
 import detailBar  from './detail-child/detailBar.vue'
+import  toast   from  './detail-child/toast.vue'
 
 export default {
   name: 'detail',
@@ -60,7 +62,8 @@ export default {
    detailComment,
    detailRecommend,
    scroll,
-   detailBar
+   detailBar,
+   toast
   },
   created(){
       
@@ -99,6 +102,8 @@ export default {
         this.detailInfo = data.detailInfo
 
         this.catData.link =  this.detailInfo.detailImage[0].list[0]
+
+        this.catData.xuan = false
 
     
         // 获得参数信息
@@ -259,6 +264,13 @@ export default {
             // 把购物车要展示的图片传到数组中
 
         //    console.log(this.catData)
+     },
+
+     addcat(arg,ar){
+
+            this.show = arg 
+
+            this.message = ar
      }
 
 
@@ -285,7 +297,10 @@ export default {
            positionTo:[],
          
            // 用一个数组来承载购物车组件要使用到的对象，方便传递给购物车组件
-           catData:{}
+           catData:{},
+           // toast显示和内容
+           message: '',
+           show : false
       }
   }  
 }

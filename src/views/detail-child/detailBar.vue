@@ -37,6 +37,11 @@ export default {
             }
         }
   },
+  data(){
+      return {
+          show: false
+      }
+  },
   methods:{
       one(){
         
@@ -47,7 +52,24 @@ export default {
         
           // 在拿到的对象中添加一个  count,用于计算用户点击次数
 
-            this.$store.dispatch('getData',this.goodsL) 
+            this.$store.dispatch('getData',this.goodsL).then((res)=>{
+
+                    this.show = !this.show
+
+                    this.message = res
+
+                this.$emit('addcat',this.show,this.message)
+
+            setTimeout(()=>{
+
+                        this.show = false
+
+                        this.$emit('addcat',this.show,this.message)
+
+            },1000)
+
+
+            }) 
         
       },
       five(){}

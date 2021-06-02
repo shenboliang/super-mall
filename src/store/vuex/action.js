@@ -6,17 +6,30 @@ export default {
             // action中不嫩直接修改 state中的数据，只能通过 context.commit的方式发送给 mutations中的方法进行修改
 
 
-        var  you =  context.state.goodsList.find(item=>{
+            return   new Promise((resolve,reject)=>{
 
-                return item.iid  == payload.iid
-        })
-        
-        if(you==undefined){
+                var  you =  context.state.goodsList.find(item=>{
 
-             context.commit('addDtata',payload)
-        }else{
-            context.commit('jia',you)
-        }
+                    return item.iid  == payload.iid
+            })
+            
+            if(you==undefined){
+    
+                 context.commit('addDtata',payload)
+
+                 resolve('添加成功')
+
+                 reject()
+
+            }else{
+                context.commit('jia',you)
+
+                resolve('商品+1')
+
+            }
+
+
+            })
 
     
 
